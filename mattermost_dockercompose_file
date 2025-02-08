@@ -58,6 +58,8 @@ networks:
 `````````````````````
 docker-compose up -d
 `````````````````````
+❇️verify the application by entering http://public-ip-address:8065
+
 
 =============================================================================================================
 Launching mattermost image on public instance and mysql image on private instance
@@ -127,6 +129,8 @@ docker-compose up -d
 
 --------------------------------------------------
 ------------------------------------------------
+
+❇️verify the application by entering http://public-ip-address-of-mattermost:80  [ 8065 port is mapped to the 80 in the compose file]
 
 Note : Ensure that mattermost running instances security group should open the 8065, 80, 443, 22 ports 
 
