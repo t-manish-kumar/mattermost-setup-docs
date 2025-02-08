@@ -1,0 +1,60 @@
+# Deloying mattermost application using docker_compose 
+### Lauch ubuntu machine on aws ec2_insatnce with instance type t2.micro
+
+#Installing Docker & Docker_Compose
+```````
+sudo apt update && sudo apt install -y docker.io docker-compose
+```````
+### Create mattermost_directory && move into the directory
+```````
+mkdir mattermost && cd mattermost
+```````
+
+### Create docker_compose.yml file
+
+``````
+vim docker_compose.yml
+``````
+
+### Paste the following content in the file and save it [esc :wq]
+`````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+services:
+  database:
+    image: mysql:8.0   
+    container_name: mattermost-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: your-root-password
+      MYSQL_DATABASE: mattermost
+      MYSQL_USER: mmuser
+      MYSQL_PASSWORD: your-mmuser-password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - mattermost_network
+
+  app:
+    image: mattermost/mattermost-team-edition:latest
+    container_name: mattermost
+    restart: unless-stopped
+    environment:
+      MM_SQLSETTINGS_DRIVERNAME: mysql
+      MM_SQLSETTINGS_DATASOURCE: "mmuser:your-mmuser-password@tcp(mattermost-mysql:3306)/mattermost?charset=utf8mb4,utf8&readTimeout=30s&writeTimeout=30s"
+    ports:
+      - "8065:8065"
+    depends_on:
+      - database
+    networks:
+      - mattermost_network
+
+volumes:
+  mysql-data:
+
+networks:
+  mattermost_network:
+```````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````  
+### To run the application in the detached mode
+`````````````````````
+docker-compose up -d
+`````````````````````
+
