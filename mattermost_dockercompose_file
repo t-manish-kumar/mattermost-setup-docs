@@ -1,4 +1,5 @@
-# Deloying mattermost application using docker_compose 
+# Deploying Mattermost application using docker_compose.
+
 ### Lauch ubuntu machine on aws ec2_insatnce with instance type t2.micro
 
 #Installing Docker & Docker_Compose
@@ -57,4 +58,78 @@ networks:
 `````````````````````
 docker-compose up -d
 `````````````````````
+
+=============================================================================================================
+Launching mattermost image on public instance and mysql image on private instance
+========================================================================================================
+✅ Launching the mysql on private instances
+
+## Lauch the ubuntu machine of type t2.micro
+# Intalling docker and docker-compose
+
+```````````````
+sudo apt update && sudo apt install -y docker.io docker-compose
+```````````````
+docker run -d \
+  --name mattermost-mysql \
+  -e MYSQL_ROOT_PASSWORD=rootpassword \
+  -e MYSQL_DATABASE=mattermost \
+  -e MYSQL_USER=mmuser \
+  -e MYSQL_PASSWORD=mmuser-password \
+  -p 3306:3306 \
+  mysql:8.0
+
+------------------
+# Log into the MySQL container:
+
+   docker exec -it mattermost-mysql mysql -u root -p
+
+# Grant access to Mattermost
+
+   FLUSH PRIVILEGES;
+------------------------
+
+verify mysql image whether running or not by entering
+
+docker ps 
+
+-----------------
+-----------------
+✅ Launching the mattermost on the Public EC2 Instance
+
+##Installation command
+
+sudo apt update && sudo apt install docker.io docker-compose -y
+
+## create a docker-compose.yml file 
+
+vim docker-compose.yml 
+
+# Copy paste the below content in the file
+
+----------------------
+version: '1'
+services:
+  mattermost:
+    image: mattermost/mattermost-team-edition:latest
+    container_name: mattermost
+    restart: unless-stopped
+    ports:
+      - "80:8065"
+    environment:
+      MM_SQLSETTINGS_DRIVERNAME: "mysql"
+      MM_SQLSETTINGS_DATASOURCE: "mmuser:your-mmuser-password@tcp(mysql-private-ip:3306)/mattermost?charset=utf8mb4,utf8&readTimeout=30s&writeTimeout=30s"
+-----------------------
+
+# starting the application in the detached mode
+
+docker-compose up -d
+
+--------------------------------------------------
+------------------------------------------------
+
+Note : Ensure that mattermost running instances security group should open the 8065, 80, 443, 22 ports 
+
+and mysql instance security group with 443, 80, 22, 3306
+
 
